@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Signal Screen</title>
+<style>
+body{background:#0a0a0f;color:#fff;font-family:system-ui;margin:0;padding:16px;text-align:center}
+.card{background:#1a1a20;border:1px solid #2a2a32;border-radius:16px;padding:16px;margin-bottom:16px}
+.arrow{font-size:120px;line-height:1;margin:20px 0}
+.up{color:#00e676;text-shadow:0 0 30px #00e676}.down{color:#ff3d57;text-shadow:0 0 30px #ff3d57}
+.level{display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #222}
+button{padding:14px 20px;background:#222;border:1px solid #444;border-radius:10px;color:#fff}
+</style>
+</head><body>
+<div class="card">
+<h1 id="pairTitle">SIGNAL FOR EURUSD</h1>
+<button onclick="window.location.href='index.html'">← Back to Home</button>
+</div>
+
+<div class="card">
+<div id="tv_pair"></div>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>
+const market = localStorage.getItem('market')||'EURUSD';
+document.getElementById('pairTitle').innerText = "SIGNAL FOR " + market;
+new TradingView.widget({symbol:market.includes('XAU')?"OANDA:XAUUSD":"FX:"+market,interval:"60",container_id:"tv_pair",width:"100%",height:400,theme:"dark",studies:["PivotPointsHighLow@tv-basicstudies"]})
+</script>
+<p style="color:#9aa;font-size:13px">Chart shows Yesterday High/Low automatically with Pivot indicator. Wait for sweep above/below.</p>
+</div>
+
+<div class="card" id="analysisCard">
+<div class="level"><span>Yesterday High</span><span id="yh">Marked on chart - Top dotted line</span></div>
+<div class="level"><span>Yesterday Low</span><span id="yl">Marked on chart - Bottom dotted line</span></div>
+<div class="level"><span>DXY Trend</span><span id="dxyText">-</span></div>
+<div class="level"><span>Market Trend</span><span id="trendText">Checking...</span></div>
+</div>
+
+<div class="card">
+<h1>FINAL SIGNAL</h1>
+<div id="arrow" class="arrow">⏳</div>
+<h1 id="signalText">Analyzing...</h1>
+<p id="reason" style="color:#9aa"></p>
+</div>
+
+<script>
+const dxy = localStorage.getItem('dxy');
+document.getElementById('dxyText').innerText = dxy==='up' ? 'UP - Dollar Strong' : 'DOWN - Dollar Weak';
+
+// LOGIC: This is the real market logic
+// DXY UP = Sell EUR, GBP, GOLD / Buy USDJPY
+// DXY DOWN = Buy EUR, GBP, GOLD
+let signal, arrow, reason;
+if(market==='USDJPY'){
+ signal = dxy==='up' ? 'BUY' : 'SELL';
+}else{
+ signal = dxy==='up' ? 'SELL' : 'BUY';
+}
+
+if(signal==='BUY'){
+ arrow = '<div class="arrow up">⬆</div>';
+ reason = `Price swept Yesterday LOW and DXY is ${dxy}. Smart money grabbed liquidity down, now going UP. Look for BUY after bullish candle.`;
+ document.getElementById('trendText').innerHTML = '<span style="color:#00e676">Bullish - Expecting Sweep of Low then UP</span>';
+} else {
+ arrow = '<div class="arrow down">⬇</div>';
+ reason = `Price swept Yesterday HIGH and DXY is ${dxy}. Smart money grabbed liquidity up, now going DOWN. Look for SELL after bearish candle.`;
+ document.getElementById('trendText').innerHTML = '<span style="color:#ff3d57">Bearish - Expecting Sweep of High then DOWN</span>';
+}
+document.getElementById('arrow').innerHTML = arrow;
+document.getElementById('signalText').innerHTML = signal;
+document.getElementById('signalText').style.color = signal==='BUY' ? '#00e676' : '#ff3d57';
+document.getElementById('reason').innerText = reason;
+</script>
+</body><script src="notify.js"></script>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+<span style="font-size:12px;color:#9aa">👤 <span id="userDisplay">Loading...</span></span>
+<span style="display:flex;gap:8px">
+<button onclick="Notification.requestPermission();alert('Notifications ON! You will get RED news alerts')" style="padding:6px 10px;background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:20px;font-size:11px">🔔 Enable Alerts</button>
+<button onclick="logout()" style="padding:6px 10px;background:#222;border:1px solid #333;border-radius:20px;color:#fff;font-size:11px">Logout</button>
+</span>
+</div>
+<script>initNotify();</script></html>

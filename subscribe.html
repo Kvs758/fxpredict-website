@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Subscribe - Candle Driver</title>
+<style>
+body{margin:0;background:#08080a;color:#fff;font-family:system-ui;padding:16px}
+.card{background:#14141c;border:1px solid #2a2a35;border-radius:20px;padding:20px;margin-bottom:16px;text-align:center}
+h1{font-size:26px}h2{font-size:18px;color:#6c5cff;text-align:left}
+p{color:#b5b5c0;font-size:14px;text-align:left}
+.plan{border:2px solid #2a2a35;border-radius:16px;padding:16px;margin:10px 0;text-align:left;cursor:pointer;position:relative}
+.plan.active{border-color:#6c5cff;background:#6c5cff11}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800}
+button{width:100%;padding:16px;border:none;border-radius:12px;font-weight:800;font-size:16px;margin-top:10px;cursor:pointer}
+.momo{padding:14px;border-radius:10px;font-weight:800;text-align:center;margin:8px 0}
+.nav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.nav a{padding:10px 14px;background:#14141c;border-radius:20px;border:1px solid #333;font-size:12px;color:#fff;text-decoration:none}
+</style></head><script src="notify.js"></script>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+<span style="font-size:12px;color:#9aa">👤 <span id="userDisplay">Loading...</span></span>
+<span style="display:flex;gap:8px">
+<button onclick="Notification.requestPermission();alert('Notifications ON! You will get RED news alerts')" style="padding:6px 10px;background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:20px;font-size:11px">🔔 Enable Alerts</button>
+<button onclick="logout()" style="padding:6px 10px;background:#222;border:1px solid #333;border-radius:20px;color:#fff;font-size:11px">Logout</button>
+</span>
+</div>
+<script>initNotify();</script><body>
+<script src="notify.js"></script>
+<div class="nav"><a href="home.html">🏠 Home</a><a href="index.html">📊 Analyse</a><a href="feedback.html">💬 Feedback</a><a href="subscribe.html" style="background:#ffcc00;color:#000;font-weight:800">💎 PRO</a></div>
+
+<div class="card">
+<h1>🔒 Choose Your Plan</h1>
+<div id="trialInfo" style="background:#00e67611;border:1px solid #00e67644;border-radius:12px;padding:12px;margin:12px 0;text-align:left"></div>
+</div>
+
+<div class="card">
+<h2>Plans (After 7-Day Free Trial)</h2>
+
+<div class="plan" onclick="selectPlan(this,1000,'Daily - 1K')">
+<div style="display:flex;justify-content:space-between"><b style="color:#fff">Daily Access</b><span class="badge" style="background:#333;color:#fff">TRY IT</span></div>
+<p><b style="color:#fff;font-size:22px">1,000 UGX</b> / day</p>
+<p style="font-size:12px">✓ Full signals for 24 hours ✓ Good to test</p>
+</div>
+
+<div class="plan active" onclick="selectPlan(this,5000,'Weekly - 5K')">
+<div style="display:flex;justify-content:space-between"><b style="color:#fff">Weekly</b><span class="badge" style="background:#6c5cff;color:#fff">POPULAR</span></div>
+<p><b style="color:#fff;font-size:22px">5,000 UGX</b> / 7 days</p>
+<p style="font-size:12px">✓ Save 2K vs daily ✓ Most traders choose this</p>
+</div>
+
+<div class="plan" onclick="selectPlan(this,11000,'Monthly - 11K')">
+<div style="display:flex;justify-content:space-between"><b style="color:#fff">Monthly</b><span class="badge" style="background:#ffcc00;color:#000">BEST VALUE - Save 19K</span></div>
+<p><b style="color:#fff;font-size:22px">11,000 UGX</b> / 30 days</p>
+<p style="font-size:12px">✓ Cheapest - Only 366 UGX per day ✓ PRO support + early features</p>
+</div>
+
+<div id="payBox" style="margin-top:20px;text-align:left">
+<h2>Pay With Mobile Money</h2>
+<p>Send <b id="payAmount" style="color:#fff">5,000 UGX</b> to:</p>
+<div class="momo" style="background:#ffcc00;color:#000">MTN: 0768529549 - Mukisa Hillary</div>
+<div class="momo" style="background:#ff0000;color:#fff">Airtel: 0741183337 - Mukisa Hillary</div>
+<p style="font-size:11px;text-align:center;color:#9aa">Reference: CANDLE + your email<br>Example: CANDLE john@gmail.com</p>
+<input id="txnId" placeholder="Transaction ID (optional)" style="width:100%;padding:14px;background:#0a0a0f;border:1px solid #333;border-radius:12px;color:#fff;box-sizing:border-box;margin-top:10px">
+<button style="background:#25D366;color:#fff" onclick="confirmPay()">✅ I HAVE PAID - Confirm on WhatsApp</button>
+<button style="background:transparent;border:1px solid #333;color:#fff" onclick="activateTrial()">Continue Free Trial</button>
+<p style="text-align:center;font-size:11px;color:#666;margin-top:10px">After payment, Mukisa activates you in 5 mins</p>
+</div>
+</div>
+
+<script>
+let selectedAmount=5000, selectedPlan='Weekly - 5K', selectedDays=7;
+function selectPlan(el,amt,plan){
+ document.querySelectorAll('.plan').forEach(p=>p.classList.remove('active'));
+ el.classList.add('active'); selectedAmount=amt; selectedPlan=plan;
+ if(amt===1000) selectedDays=1; else if(amt===5000) selectedDays=7; else selectedDays=30;
+ document.getElementById('payAmount').innerText=amt.toLocaleString()+' UGX';
+}
+function checkTrial(){
+ let start=localStorage.getItem('cd_trial_start');
+ if(!start){start=Date.now();localStorage.setItem('cd_trial_start',start);}
+ let daysPassed=Math.floor((Date.now()-start)/86400000);
+ let daysLeft=7-daysPassed;
+ let info=document.getElementById('trialInfo');
+ let sub=localStorage.getItem('cd_subscribed')==='true';
+ let subEnd=localStorage.getItem('cd_sub_end');
+ let subDaysLeft=subEnd?Math.ceil((subEnd-Date.now())/86400000):0;
+ if(sub && subDaysLeft>0){info.innerHTML=`<b style="color:#00e676">✅ PRO Active - ${localStorage.getItem('cd_plan')||selectedPlan} - ${subDaysLeft} days left</b><br><span style="font-size:12px">Thank you for supporting Mukisa</span>`;}
+ else if(sub && subDaysLeft<=0){localStorage.removeItem('cd_subscribed'); info.innerHTML=`<b style="color:#ff3d57">⏰ Subscription Ended - Please renew</b>`; }
+ else if(daysLeft>0){info.innerHTML=`<b style="color:#00e676">🎉 ${daysLeft} days FREE trial left</b><br><span style="font-size:12px">Started ${new Date(parseInt(start)).toLocaleDateString()} - No payment needed now</span>`;}
+ else{info.innerHTML=`<b style="color:#ff3d57">⏰ Trial Ended - Choose a plan to continue</b>`;}
+}
+checkTrial();
+function activateTrial(){
+ let daysLeft=7-Math.floor((Date.now()-localStorage.getItem('cd_trial_start'))/86400000);
+ if(daysLeft>0) location.href='home.html'; else alert('Trial ended. Please subscribe.');
+}
+function confirmPay(){
+ let email=localStorage.getItem('cd_user')||'Guest';
+ let txn=document.getElementById('txnId').value;
+ let text=`Hi Mukisa, I paid ${selectedAmount} UGX for ${selectedPlan} (${selectedDays} days) - Candle Driver. Email: ${email} Txn: ${txn} Please activate.`;
+ window.open(`https://wa.me/256741183337?text=${encodeURIComponent(text)}`,'_blank');
+ // Auto activate for demo
+ let endDate=Date.now()+(selectedDays*86400000);
+ localStorage.setItem('cd_subscribed','true');
+ localStorage.setItem('cd_sub_end',endDate);
+ localStorage.setItem('cd_plan',selectedPlan);
+ alert('WhatsApp opened! Demo: PRO activated for '+selectedDays+' days. Mukisa will confirm.');
+ location.href='home.html';
+}
+</script>
+</body></html>

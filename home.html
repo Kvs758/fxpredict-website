@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mukisa Hillary - Candle Driver System</title>
+<style>
+body{margin:0;background:#08080a;color:#fff;font-family:system-ui;line-height:1.6}
+.hero{padding:40px 20px;background:linear-gradient(180deg,#1a1a3a 0%,#08080a 100%);text-align:center}
+.card{background:#14141c;border:1px solid #2a2a35;border-radius:20px;padding:20px;margin:16px}
+h1{font-size:32px;margin:10px 0}h2{font-size:20px;color:#6c5cff;margin:0 0 10px}
+p{color:#b5b5c0;font-size:15px}
+.btn{display:block;width:100%;padding:18px;background:#6c5cff;border:none;border-radius:14px;color:#fff;font-size:20px;font-weight:800;text-align:center;text-decoration:none;margin:20px 0;box-shadow:0 10px 30px #6c5cff44}
+.btn-outline{display:block;width:100%;padding:14px;background:transparent;border:1px solid #333;border-radius:14px;color:#fff;text-align:center;text-decoration:none}
+.step{display:flex;gap:14px;margin:16px 0}
+.num{width:36px;height:36px;background:#6c5cff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.founder{display:flex;gap:16px;align-items:center}
+.avatar{width:70px;height:70px;background:linear-gradient(135deg,#6c5cff,#00e5ff);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800}
+.badge{display:inline-block;padding:4px 12px;background:#00e67622;color:#00e676;border-radius:20px;font-size:12px;font-weight:700}
+</style>
+</head>
+<script src="notify.js"></script>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+<span style="font-size:12px;color:#9aa">👤 <span id="userDisplay">Loading...</span></span>
+<span style="display:flex;gap:8px">
+<button onclick="Notification.requestPermission();alert('Notifications ON! You will get RED news alerts')" style="padding:6px 10px;background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:20px;font-size:11px">🔔 Enable Alerts</button>
+<button onclick="logout()" style="padding:6px 10px;background:#222;border:1px solid #333;border-radius:20px;color:#fff;font-size:11px">Logout</button>
+</span>
+</div>
+<script>initNotify();</script>
+<body>
+
+<div class="hero">
+<div style="display:flex;gap:10px;justify-content:center;margin:16px">
+<a href="home.html" style="padding:10px 16px;background:#6c5cff;color:#fff;border-radius:20px;text-decoration:none">Home</a>
+<a href="index.html" style="padding:10px 16px;background:#14141c;border:1px solid #333;border-radius:20px;color:#fff;text-decoration:none">📊 Analyse</a>
+<a href="feedback.html" style="padding:10px 16px;background:#14141c;border:1px solid #333;border-radius:20px;color:#fff;text-decoration:none">💬 Feedback</a>
+</div><div style="display:flex;gap:10px;justify-content:center;margin:16px">
+<a href="home.html" style="padding:10px 16px;background:#6c5cff;color:#fff;border-radius:20px;text-decoration:none">Home</a>
+<a href="index.html" style="padding:10px 16px;background:#14141c;border:1px solid #333;border-radius:20px;color:#fff;text-decoration:none">📊 Analyse</a>
+<a href="feedback.html" style="padding:10px 16px;background:#14141c;border:1px solid #333;border-radius:20px;color:#fff;text-decoration:none">💬 Feedback</a>
+</div>
+<span class="badge">LIVE • DXY + FOREX FACTORY LINKED</span>
+<h1>CANDLE DRIVER</h1>
+<p style="color:#fff;font-size:18px;font-weight:600">Stop trading the candle. Start trading what MOVES the candle.</p>
+<p>Candles only show RESULT. We check the CAUSE before you click BUY or SELL.</p>
+<a href="index.html" class="btn">YES, ANALYSE THE MARKET →</a>
+<a href="#how" class="btn-outline">How it works ↓</a>
+</div>
+
+<div class="card" id="how">
+<h2>How The System Works</h2>
+<p>Most traders in Uganda lose because they only look at up/down candles. This system checks 3 real drivers in real-time:</p>
+
+<div class="step"><div class="num">1</div><div><b style="color:#fff">DXY - Dollar Strength (Live)</b><br>We link directly to TradingView DXY. If DXY is UP, we know EUR/USD, GBP/USD, GOLD will go DOWN. If DXY is DOWN, they go UP. You don't guess.</div></div>
+
+<div class="step"><div class="num">2</div><div><b style="color:#fff">ForexFactory Red News (Live)</b><br>System is linked to ForexFactory.com. It shows you real-time RED folder news. It blocks you from trading 15 mins before/after news - that's where most stop-losses die.</div></div>
+
+<div class="step"><div class="num">3</div><div><b style="color:#fff">Liquidity Sweep + Yesterday High/Low</b><br>Market always takes Yesterday High/Low first to grab stop-losses, then goes real direction. On the Signal page we mark Yesterday High & Low for you and give you a big ⬆ BUY or ⬇ SELL arrow.</div></div>
+</div>
+
+<div class="card">
+<h2>What You Get Inside</h2>
+<p>✅ <b>Market Selector:</b> EURUSD, GBPUSD, XAUUSD (Gold), USDJPY<br>
+✅ <b>Live DXY Chart</b> linked from TradingView<br>
+✅ <b>Live News Calendar</b> linked from ForexFactory<br>
+✅ <b>Checklist Engine</b> - you cannot get signal until you check all<br>
+✅ <b>Signal Screen</b> - Yesterday High/Low marked + Trend + BUY/SELL arrow</p>
+<a href="index.html" class="btn">ANALYSE MY MARKET NOW</a>
+</div>
+
+<div class="card">
+<h2>About The Founder</h2>
+<div class="founder">
+<div class="avatar">MH</div>
+<div>
+<b style="font-size:18px">Mukisa Hillary</b><br>
+<span style="color:#9aa">Founder - Candle Driver System</span><br>
+<span class="badge">From Uganda • For Traders</span>
+</div>
+</div>
+<p style="margin-top:16px">
+I am <b style="color:#fff">Mukisa Hillary</b>, a trader and system builder from Uganda. I built Candle Driver because I was tired of losing to fake candles.
+
+<br><br>Like many, I used to watch candles go up and click BUY, only to see it crash. Then I learned the truth: Candles are the RESULT, not the driver. Real drivers are DXY, Interest Rates, News, and Liquidity.
+
+<br><br>This system is my checklist that I use every day at 10:00 EAT (London Open) from Kampala. It forces me to check what matters before I trade.
+
+<br><br><b style="color:#fff">Mission:</b> To help 1000 Ugandan traders stop gambling candles and start trading the cause.
+</p>
+</div>
+
+<div class="card" style="text-align:center">
+<h2>Ready?</h2>
+<p>Do you want to see the real analysis of your market right now?</p>
+<a href="index.html" class="btn" style="font-size:22px">YES, SHOW ME THE ANALYSIS</a>
+<p style="font-size:12px;color:#666">Free • No Login • Live Data from TradingView + ForexFactory</p>
+</div>
+
+</body>
+</html>

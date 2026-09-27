@@ -1,0 +1,39 @@
+nfunction initNotify(){
+ if(localStorage.getItem('cd_login')!=='true'){window.location.href='login.html';return;}
+ 
+ let start = localStorage.getItem('cd_trial_start');
+ if(!start){localStorage.setItem('cd_trial_start',Date.now()); start=Date.now();}
+ 
+ let daysPassed = Math.floor((Date.now()-parseInt(start))/(1000*60*60*24));
+ let isSubscribed = localStorage.getItem('cd_subscribed')==='true';
+ 
+ if(daysPassed>=7 && !isSubscribed){
+   if(!window.location.href.includes('subscribe.html')){
+     window.location.href='subscribe.html';
+   }
+   return;
+ }
+
+ if(Notification.permission!=='granted'){Notification.requestPermission();}
+ setInterval(checkNewsAlert,60000);
+ checkNewsAlert();
+
+ let user = localStorage.getItem('cd_user');
+ let el = document.getElementById('userDisplay');
+ if(el) el.innerText = user + (isSubscribed?' • PRO ✅':` • Trial: ${7-daysPassed} days left`);
+}
+
+function checkNewsAlert(){
+ const now=new Date(); const hours=now.getHours();
+ const redTimes=[11,15,17];
+ redTimes.forEach(t=>{
+   if(hours===t-1 && now.getMinutes()>=45){
+     new Notification(`⚠️ RED NEWS in 15 mins (${t}:00 EAT)`,{body:'DO NOT TRADE - High volatility coming'});
+     let b=document.getElementById('alertBanner');
+     if(!b){b=document.createElement('div');b.id='alertBanner';b.style.cssText='position:fixed;top:0;left:0;width:100%;background:#ff3d57;color:#fff;padding:14px;text-align:center;font-weight:800;z-index:99999;';document.body.prepend(b);}
+     b.innerText=`⚠️ RED NEWS in 15 mins (${t}:00 EAT) - DO NOT TRADE`;
+     setTimeout(()=>b.style.display='none',15000);
+   }
+ });
+}
+function logout(){localStorage.removeItem('cd_login');window.location.href='login.html';}

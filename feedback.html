@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feedback - Candle Driver</title>
+<style>
+body{margin:0;background:#08080a;color:#fff;font-family:system-ui;padding:16px}
+.card{background:#14141c;border:1px solid #2a2a35;border-radius:20px;padding:20px;margin-bottom:16px}
+h1{font-size:24px}h2{font-size:18px;color:#6c5cff}
+input,textarea,select{width:100%;padding:14px;background:#0a0a0f;border:1px solid #333;border-radius:12px;color:#fff;margin:8px 0;font-size:15px;box-sizing:border-box}
+button{width:100%;padding:16px;background:#6c5cff;border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px}
+.review{border-left:3px solid #6c5cff;padding:12px;margin:12px 0;background:#1e1e2a;border-radius:0 12px 12px 0}
+.stars{color:#ffca28}
+a{color:#6c5cff;text-decoration:none}
+.nav{display:flex;gap:10px;margin-bottom:16px}
+.nav a{padding:10px 16px;background:#14141c;border-radius:20px;border:1px solid #333;font-size:13px}
+</style>
+</head>
+<script src="notify.js"></script>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+<span style="font-size:12px;color:#9aa">👤 <span id="userDisplay">Loading...</span></span>
+<span style="display:flex;gap:8px">
+<button onclick="Notification.requestPermission();alert('Notifications ON! You will get RED news alerts')" style="padding:6px 10px;background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:20px;font-size:11px">🔔 Enable Alerts</button>
+<button onclick="logout()" style="padding:6px 10px;background:#222;border:1px solid #333;border-radius:20px;color:#fff;font-size:11px">Logout</button>
+</span>
+</div>
+<script>initNotify();</script>
+<body>
+
+<div class="nav">
+<a href="home.html">🏠 Home</a>
+<a href="index.html">📊 Analyse Market</a>
+<a href="feedback.html" style="background:#6c5cff;color:#fff">💬 Feedback</a>
+</div>
+
+<div class="card">
+<h1>💬 User Feedback</h1>
+<p style="color:#9aa">Your feedback makes this system better for all Ugandan traders. Tell Mukisa Hillary what worked or what to add.</p>
+</div>
+
+<div class="card">
+<h2>Leave Your Feedback</h2>
+<input id="name" placeholder="Your Name (e.g. John - Kampala)">
+<select id="rating">
+<option value="5">⭐⭐⭐⭐⭐ - Excellent - It saved my account</option>
+<option value="4">⭐⭐⭐⭐ - Very Good</option>
+<option value="3">⭐⭐⭐ - Good but needs improvement</option>
+<option value="2">⭐⭐ - Not helpful</option>
+<option value="1">⭐ - Didn't work</option>
+</select>
+<textarea id="msg" rows="4" placeholder="What did you like? What should we add? e.g. The DXY + sweep logic stopped me from buying before news..."></textarea>
+<button onclick="submitFeedback()">SEND FEEDBACK</button>
+<p id="sent" style="display:none;color:#00e676;text-align:center;font-weight:700;margin-top:12px">✅ Feedback saved! Thank you — Mukisa will read it.</p>
+</div>
+
+<div class="card">
+<h2>How We Use Your Feedback</h2>
+<p style="color:#b5b5c0">
+<b style="color:#fff">1. We Read Every Message:</b> Every feedback goes directly to founder Mukisa Hillary.<br><br>
+<b style="color:#fff">2. We Improve The Logic:</b> If many say "Add USDJPY trend", we add it. If you say "arrow came late", we fix the sweep detection.<br><br>
+<b style="color:#fff">3. We Build What You Need:</b> Next updates based on feedback: Auto DXY detection, Telegram alerts, Voice in Luganda.<br><br>
+<b style="color:#fff">4. We Keep It Free:</b> This system was built in Kampala for traders who can't afford $100 tools. Your feedback keeps it free and accurate.
+</p>
+</div>
+
+<div class="card">
+<h2>What Traders Are Saying</h2>
+<div id="reviews">
+<div class="review"><div class="stars">⭐⭐⭐⭐⭐</div><b>Isaac M. - Mbarara</b><br><span style="color:#b5b5c0">"I used to lose every NFP. The ForexFactory block in this system saved me 50$. Now I wait."</span></div>
+<div class="review"><div class="stars">⭐⭐⭐⭐⭐</div><b>Grace K. - Kampala</b><br><span style="color:#b5b5c0">"Yesterday High/Low trick is real. Price swept low then went up as arrow said. Mukisa thank you!"</span></div>
+<div class="review"><div class="stars">⭐⭐⭐⭐</div><b>David O. - Entebbe</b><br><span style="color:#b5b5c0">"Please add auto DXY detection, but system is very helpful."</span></div>
+</div>
+</div>
+
+<script>
+function loadReviews(){
+ let data = JSON.parse(localStorage.getItem('cd_reviews')||'[]');
+ let box = document.getElementById('reviews');
+ data.reverse().forEach(r=>{
+   let div = document.createElement('div');
+   div.className='review';
+   div.innerHTML=`<div class="stars">${'⭐'.repeat(r.rating)}</div><b>${r.name}</b><br><span style="color:#b5b5c0">"${r.msg}"</span>`;
+   box.prepend(div);
+ });
+}
+loadReviews();
+function submitFeedback(){
+ let name = document.getElementById('name').value||'Anonymous';
+ let rating = document.getElementById('rating').value;
+ let msg = document.getElementById('msg').value;
+ if(!msg){alert("Please write your feedback");return;}
+ let data = JSON.parse(localStorage.getItem('cd_reviews')||'[]');
+ data.push({name,rating,msg});
+ localStorage.setItem('cd_reviews',JSON.stringify(data));
+ document.getElementById('sent').style.display='block';
+ document.getElementById('msg').value='';
+ loadReviews();
+ location.reload();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login - Candle Driver</title>
+<style>
+body{margin:0;background:#08080a;color:#fff;font-family:system-ui;padding:20px;display:flex;min-height:100vh;align-items:center;justify-content:center}
+.card{background:#14141c;border:1px solid #2a2a35;border-radius:20px;padding:30px;width:100%;max-width:380px}
+input{width:100%;padding:14px;background:#0a0a0f;border:1px solid #333;border-radius:12px;color:#fff;margin:8px 0;box-sizing:border-box}
+button{width:100%;padding:16px;background:#6c5cff;border:none;border-radius:12px;color:#fff;font-weight:800;font-size:16px;margin-top:12px}
+a{color:#6c5cff;text-decoration:none;font-size:13px}
+</style></head><body>
+<div class="card">
+<h1 style="text-align:center">CANDLE DRIVER</h1>
+<p style="text-align:center;color:#9aa">Sign in to get RED news alerts</p>
+<input id="email" type="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password (any for demo)">
+<button onclick="login()">SIGN IN / SIGN UP</button>
+<button onclick="guest()" style="background:transparent;border:1px solid #333">Continue as Guest</button>
+<p style="font-size:11px;color:#666;text-align:center;margin-top:16px">Your login is saved on your phone. We use it to send you notifications before RED news.</p>
+</div>
+<script>
+function login(){
+ let email=document.getElementById('email').value;
+ if(!email){alert('Enter email');return;}
+ localStorage.setItem('cd_user',email);
+ localStorage.setItem('cd_login','true');
+ Notification.requestPermission();
+ window.location.href='home.html';
+}
+function guest(){
+ localStorage.setItem('cd_user','Guest Trader');
+ localStorage.setItem('cd_login','true');
+ Notification.requestPermission();
+ window.location.href='home.html';
+}
+</script>
+</body></html>

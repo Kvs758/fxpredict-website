@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Candle Driver - Home</title>
+<style>
+body{background:#0f0f12;color:#fff;font-family:system-ui;margin:0;padding:16px}
+.card{background:#1a1a20;border:1px solid #2a2a32;border-radius:16px;padding:16px;margin-bottom:16px}
+h1{font-size:20px}h2{font-size:14px;color:#9aa}
+select{width:100%;padding:12px;background:#0f0f12;border:1px solid #333;border-radius:10px;color:#fff}
+.check{padding:12px;border:1px solid #2a2a32;border-radius:12px;margin:8px 0;display:flex;gap:10px}
+.check.done{border-color:#00e676;background:#00e67611}
+button{width:100%;padding:16px;background:#6c5cff;border:none;border-radius:12px;color:#fff;font-weight:800;font-size:18px}
+iframe{width:100%;height:320px;border:none;border-radius:12px;background:#fff}
+</style>
+</head>
+<script src="notify.js"></script>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+<span style="font-size:12px;color:#9aa">👤 <span id="userDisplay">Loading...</span></span>
+<span style="display:flex;gap:8px">
+<button onclick="Notification.requestPermission();alert('Notifications ON! You will get RED news alerts')" style="padding:6px 10px;background:#00e67622;color:#00e676;border:1px solid #00e67644;border-radius:20px;font-size:11px">🔔 Enable Alerts</button>
+<button onclick="logout()" style="padding:6px 10px;background:#222;border:1px solid #333;border-radius:20px;color:#fff;font-size:11px">Logout</button>
+</span>
+</div>
+<script>initNotify();</script><body>
+<div class="card">
+<h1>CANDLE DRIVER - HOME</h1>
+<h2>Real-time linked to DXY + ForexFactory</h2>
+<label>Select Market</label>
+<select id="market">
+<option value="EURUSD">EUR/USD</option>
+<option value="GBPUSD">GBP/USD</option>
+<option value="XAUUSD">GOLD</option>
+<option value="USDJPY">USD/JPY</option>
+</select>
+<select id="dxyTrend" style="margin-top:10px">
+<option value="up">DXY is UP today (Dollar Strong)</option>
+<option value="down">DXY is DOWN today (Dollar Weak)</option>
+</select>
+</div>
+
+<div class="card">
+<h1>DXY Live</h1>
+<div id="tv_dxy"></div>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<script>new TradingView.widget({symbol:"TVC:DXY",interval:"60",container_id:"tv_dxy",width:"100%",height:300,theme:"dark"})</script>
+</div>
+<div class="card">
+<h1>2. DXY Auto-Check (Live - No Manual)</h1>
+<div id="dxyBox" style="background:#0a0a0f;border-radius:12px;padding:16px;text-align:left">
+<div style="display:flex;justify-content:space-between"><span style="color:#9aa">DXY Price:</span><b id="dxyPrice" style="color:#fff">Loading...</b></div>
+<div style="display:flex;justify-content:space-between;margin-top:8px"><span style="color:#9aa">Trend (15m):</span><b id="dxyTrend">Checking...</b></div>
+<div style="display:flex;justify-content:space-between;margin-top:8px"><span style="color:#9aa">Signal for <span id="pairLabel">EURUSD</span>:</span><b id="dxyAdvice" style="color:#00e676">--</b></div>
+<div id="dxyBar" style="height:6px;background:#222;border-radius:10px;margin-top:12px;overflow:hidden"><div id="dxyFill" style="width:50%;height:100%;background:#6c5cff"></div></div>
+</div>
+<div style="height:200px;margin-top:10px"><iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_123&symbol=TVC%3ADXY&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=dark&style=1&timezone=Africa%2FKampala" style="width:100%;height:100%" frameborder="0"></iframe></div>
+<p style="font-size:11px;color:#666">Auto-updates every 60 seconds • Uses Yahoo Finance DXY data</p>
+</div>
+
+<div class="card">
+<h1>3. Auto Checklist ✅</h1>
+<div id="autoChecks" style="text-align:left">
+<div class="check" style="background:#00e67611;border:1px solid #00e67644"><span id="checkDxy">⏳ Checking DXY...</span></div>
+<div class="check" id="checkNewsBox"><span id="checkNews">⏳ Checking RED news...</span></div>
+<div class="check" id="checkTimeBox"><span id="checkTime">⏳ Checking market time...</span></div>
+</div>
+<button class="primary" id="signalBtn" onclick="getSignal()" style="opacity:0.5" disabled>GET SIGNAL → (Wait for checks)</button>
+<p id="err" style="color:#ff3d57;display:none;text-align:center"></p>
+</div>
+
+<script>
+// AUTOMATE DXY CHECK
+let dxyData = {price:0, trend:'', direction:''};
+
+async function autoDXY(){
+ try{
+   // Yahoo Finance proxy - DXY = DX-Y.NYB
+   const res = await fetch('https://api.allorigins.win/raw?url=https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB?interval=5m&range=1d');
+   const data = await res.json();
+   const prices = data.chart.result[0].indicators.quote[0].close.filter(p=>p);
+   const last = prices[prices.length-1];
+   const prev = prices[prices.length-6] || prices[0]; // 30 mins ago
+
+   dxyData.price = last;
+   document.getElementById('dxyPrice').innerText = last.toFixed(3);
+
+   let pair = document.getElementById('pair').value;
+   document.getElementById('pairLabel').innerText = pair;
+
+   if(last > prev){
+     dxyData.trend = 'UP'; dxyData.direction = 'DOWN';
+     document.getElementById('dxyTrend').innerHTML = '<span style="color:#ff5252">⬆ UP (Dollar Strong)</span>';
+     document.getElementById('dxyFill').style.cssText='width:80%;height:100%;background:#ff5252';
+     // If DXY UP, EURUSD, GBPUSD, GOLD go DOWN
+     if(pair.includes('EUR')||pair.includes('GBP')||pair.includes('XAU')||pair.includes('GOLD')){
+       document.getElementById('dxyAdvice').innerHTML='<span style="color:#ff5252">SELL '+pair+'</span>';
+     } else {
+       document.getElementById('dxyAdvice').innerHTML='<span style="color:#00e676">BUY '+pair+'</span>';
+     }
+   } else {
+     dxyData.trend = 'DOWN'; dxyData.direction = 'UP';
+     document.getElementById('dxyTrend').innerHTML = '<span style="color:#00e676">⬇ DOWN (Dollar Weak)</span>';
+     document.getElementById('dxyFill').style.cssText='width:30%;height:100%;background:#00e676';
+     if(pair.includes('EUR')||pair.includes('GBP')||pair.includes('XAU')||pair.includes('GOLD')){
+       document.getElementById('dxyAdvice').innerHTML='<span style="color:#00e676">BUY '+pair+'</span>';
+     } else {
+       document.getElementById('dxyAdvice').innerHTML='<span style="color:#ff5252">SELL '+pair+'</span>';
+     }
+   }
+
+   // Auto check DXY
+   document.getElementById('checkDxy').innerHTML = `✅ DXY ${dxyData.trend} - Ready to ${document.getElementById('dxyAdvice').innerText}`;
+   document.getElementById('checkDxy').parentElement.style.background='#00e67611';
+   checkAllReady();
+
+   localStorage.setItem('cd_dxy_trend', dxyData.trend);
+   localStorage.setItem('cd_dxy_advice', document.getElementById('dxyAdvice').innerText);
+
+ }catch(e){
+   document.getElementById('dxyTrend').innerHTML='⚠️ Using chart - Look manually';
+   document.getElementById('checkDxy').innerHTML='✅ Chart loaded - Check DXY visually';
+   checkAllReady();
+ }
+}
+
+function autoTimeCheck(){
+ let now = new Date();
+ let hour = now.getHours();
+ let day = now.getDay();
+ let txt='';
+ if(day===0||day===6){ txt='❌ Weekend - Market Closed'; document.getElementById('checkTimeBox').style.background='#ff525211'; }
+ else if(hour<3||hour>=23){ txt='⚠️ Low volatility time (Spread high)'; }
+ else { txt='✅ Market Open - Good to trade'; document.getElementById('checkTimeBox').style.background='#00e67611'; }
+ document.getElementById('checkTime').innerText=txt;
+}
+
+let newsOk = false;
+function autoNewsCheck(isRedSoon){
+ if(isRedSoon){
+   document.getElementById('checkNews').innerText='❌ RED NEWS in 15 mins - DO NOT TRADE';
+   document.getElementById('checkNewsBox').style.background='#ff525211';
+   document.getElementById('checkNewsBox').style.border='1px solid #ff525244';
+   document.getElementById('signalBtn').disabled=true;
+   document.getElementById('signalBtn').style.opacity='0.5';
+   document.getElementById('signalBtn').innerText='BLOCKED - RED NEWS';
+ } else {
+   document.getElementById('checkNews').innerText='✅ No RED news now - Safe';
+   document.getElementById('checkNewsBox').style.background='#00e67611';
+   newsOk=true;
+   checkAllReady();
+ }
+}
+
+function checkAllReady(){
+ if(document.getElementById('checkDxy').innerText.includes('✅') && newsOk){
+   document.getElementById('signalBtn').disabled=false;
+   document.getElementById('signalBtn').style.opacity='1';
+   document.getElementById('signalBtn').innerText='GET SIGNAL → Auto Ready';
+ }
+}
+
+document.getElementById('pair').addEventListener('change', autoDXY);
+
+// Run every 60 sec
+autoDXY(); autoTimeCheck();
+setInterval(autoDXY, 60000);
+</script>
+
+<div class="card">
+<h1>3. Today's RED News - Live (No ForexFactory Needed)</h1>
+<p style="color:#9aa;font-size:13px">Auto-fetching high-impact news - Updated live</p>
+<div id="newsBox" style="background:#0a0a0f;border-radius:12px;padding:12px;max-height:400px;overflow:auto">Loading news...</div>
+<button onclick="loadNews()" style="margin-top:10px;padding:10px;background:#222;border:1px solid #333;border-radius:10px;color:#fff;width:100%">🔄 Refresh News</button>
+<p style="font-size:11px;color:#666;margin-top:8px">Source: Faireconomy (ForexFactory data) + Investing.com backup • Auto filtered for RED folder only</p>
+</div>
+
+<script>
+async function loadNews(){
+ const box = document.getElementById('newsBox');
+ box.innerHTML = 'Loading RED news...';
+ try {
+   // This is ForexFactory's own JSON feed - allowed
+   const res = await fetch('https://api.allorigins.win/raw?url=https://nfs.faireconomy.media/ff_calendar_thisweek.json');
+   const data = await res.json();
+   const today = new Date().toISOString().split('T')[0];
+   const todayNews = data.filter(n => n.date.includes(today) && n.impact === 'High');
+
+   if(todayNews.length === 0){
+     box.innerHTML = '<div style="color:#00e676;padding:20px;text-align:center">✅ No RED news today - Safe to trade all day</div>';
+     return;
+   }
+
+   let html = '';
+   todayNews.forEach(n => {
+     let time = n.time || 'All Day';
+     let color = n.currency === 'USD'? '#00e676' : n.currency === 'EUR'? '#448aff' : '#ffca28';
+     html += `<div style="display:flex;gap:10px;padding:10px;border-bottom:1px solid #222;align-items:center">
+     <div style="background:${color}22;color:${color};padding:4px 8px;border-radius:20px;font-size:11px;font-weight:700">${n.currency}</div>
+     <div style="flex:1;text-align:left"><b style="color:#fff">${n.title}</b><br><span style="font-size:11px;color:#9aa">${time} EAT • Impact: 🔴 HIGH</span></div>
+     </div>`;
+   });
+   box.innerHTML = html + `<div style="padding:10px;color:#ff5252;font-size:12px;text-align:center">⚠️ RULE: Don't trade 15 mins before and after these times</div>`;
+
+ } catch(e){
+   // Fallback to Investing.com widget if API fails
+   box.innerHTML = `<iframe src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=5,6,25,32,72&calType=day&timeZone=8&lang=1" width="100%" height="350" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0"></iframe>
+   <p style="color:#9aa;font-size:11px">Backup source: Investing.com - Look for 3 stars = RED news</p>`;
+ }
+}
+loadNews();
+</script>
+
+<div class="card">
+<h1>Checklist</h1>
+<div class="check" onclick="this.classList.toggle('done')"><input type="checkbox"> DXY checked?</div>
+<div class="check" onclick="this.classList.toggle('done')"><input type="checkbox"> Red news checked?</div>
+<div class="check" onclick="this.classList.toggle('done')"><input type="checkbox"> London open (10:00 EAT)?</div>
+<button onclick="goSignal()">GET SIGNAL →</button>
+</div>
+
+<script>
+function goSignal(){
+ const market = document.getElementById('market').value;
+ const dxy = document.getElementById('dxyTrend').value;
+ const done = document.querySelectorAll('.check.done').length;
+ if(done<3){alert("Complete all 3 checks first");return;}
+ localStorage.setItem('market',market);
+ localStorage.setItem('dxy',dxy);
+ window.location.href = "signal.html";
+}
+</script>
+</body></html>
